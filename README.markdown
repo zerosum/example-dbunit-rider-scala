@@ -1,0 +1,1 @@
+Just a simple example for using [DBUnit](http://dbunit.sourceforge.net/) and [Database Rider](https://database-rider.github.io/database-rider/) in a Scala project.

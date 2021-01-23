@@ -1,0 +1,9 @@
+{
+  "tweet": [
+    {
+      "id": "abcdef12345",
+      "content": "dbunit json example",
+      "user_id": 1
+    }
+  ]
+}
