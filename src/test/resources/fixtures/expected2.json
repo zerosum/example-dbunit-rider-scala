@@ -1,0 +1,14 @@
+{
+  "tweet": [
+    {
+      "id": "abcdef12345",
+      "content": "dbunit json example",
+      "user_id": 1
+    },
+    {
+      "id": "ghijkl67890",
+      "content": "regex:^another [\\w ]+",
+      "user_id": 2
+    }
+  ]
+}

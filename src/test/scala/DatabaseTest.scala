@@ -1,8 +1,13 @@
 import com.github.database.rider.core.api.dataset.JSONDataSet
+import com.github.database.rider.core.assertion.DataSetAssertion
 import com.typesafe.scalalogging.LazyLogging
-import org.dbunit.database.IDatabaseConnection
+import org.dbunit.assertion.comparer.value.{ValueComparer, ValueComparers}
+import org.dbunit.assertion.comparer.value.builder.ColumnValueComparerMapBuilder
+import org.dbunit.database.{CachedResultSetTable, IDatabaseConnection}
+import org.dbunit.dataset.datatype.DataType
 import org.dbunit.dataset.filter.DefaultColumnFilter
-import org.dbunit.dataset.{ColumnFilterTable, IDataSet, ITable}
+import org.dbunit.dataset.stream.IDataSetProducer
+import org.dbunit.dataset.{CachedDataSet, ColumnFilterTable, IDataSet, ITable}
 import org.dbunit.operation.DatabaseOperation
 import org.dbunit.{JdbcDatabaseTester, Assertion => dbAssertion}
 import org.scalatest.BeforeAndAfterAll
@@ -18,9 +23,9 @@ class DatabaseTest extends AnyFunSpec with should.Matchers with BeforeAndAfterAl
   import implicits._
 
   describe("Sample test-cases with DBUnit and Database Rider") {
-    it("case1: json as datasets works well!") {
-      lazy val givenDataSet    = new JSONDataSet(new File("src/test/resources/fixtures/given.json"))
-      lazy val expectedDataSet = new JSONDataSet(new File("src/test/resources/fixtures/expected.json"))
+    it("case1-1: json as datasets works well!") {
+      lazy val givenDataSet    = new JSONDataSet(new File("src/test/resources/fixtures/given1.json"))
+      lazy val expectedDataSet = new JSONDataSet(new File("src/test/resources/fixtures/expected1.json"))
 
       withFixture(givenDataSet) { conn =>
         val actual = conn
@@ -32,11 +37,26 @@ class DatabaseTest extends AnyFunSpec with should.Matchers with BeforeAndAfterAl
         dbAssertion.assertEquals(expected, actual)
       }
     }
+
     it(
-      "case2: check that case1's fixtures has been cleaned up. There is no unique-constraint-violation on using same given datasets."
+      "case1-2: check that case1's fixtures has been cleaned up. There is no unique-constraint-violation on using same given datasets."
     ) {
-      lazy val givenDataSet = new JSONDataSet(new File("src/test/resources/fixtures/given.json"))
+      lazy val givenDataSet = new JSONDataSet(new File("src/test/resources/fixtures/given1.json"))
       withFixture(givenDataSet) { conn => }
+    }
+
+    it(
+      "case2: regex comparer works well"
+    ) {
+      lazy val givenDataSet    = new JSONDataSet(new File("src/test/resources/fixtures/given2.json"))
+      lazy val expectedDataSet = new JSONDataSet(new File("src/test/resources/fixtures/expected2.json"))
+
+      withFixture(givenDataSet) { conn =>
+        val actual   = conn.createTable("tweet")
+        val expected = expectedDataSet.getTable("tweet")
+
+        DataSetAssertion.assertEqualsIgnoreCols(expected, actual, Array("date"))
+      }
     }
   }
 
